@@ -1,0 +1,12 @@
+.env
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+orvencore_dev.db
+orvencore.db
+*.sqlite
+*.sqlite3
+orvencore_api_and_auth.egg-info/
