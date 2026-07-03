@@ -6,6 +6,7 @@ from sqlalchemy import select
 from app.main import app
 from app.database import SessionLocal
 from app.models.role import Role
+from app.services.registry import ensure_default_services
 from app.services.api_keys import create_api_key
 from app.services.users import get_user_by_username_or_email
 
@@ -195,9 +196,99 @@ def test_frontend_and_bot_health_alias_are_served():
     with TestClient(app) as client:
         frontend_response = client.get("/?source=discord&discord_link_token=test-token")
         assert frontend_response.status_code == 200
-        assert "OrvenCore Identity" in frontend_response.text
-        assert "discord-form" in frontend_response.text
+        assert "<title>OrvenCore</title>" in frontend_response.text
+
+        dashboard_response = client.get("/dashboard")
+        assert dashboard_response.status_code == 200
 
         health_response = client.get("/api/health")
         assert health_response.status_code == 200
         assert health_response.json() == {"status": "ok"}
+
+
+def test_services_public_detail_access_and_admin_management():
+    normal_username = unique("svcuser")
+    admin_username = unique("svcadmin")
+
+    with TestClient(app) as client:
+        services_response = client.get("/services")
+        assert services_response.status_code == 200
+        services = services_response.json()
+        assert {service["slug"] for service in services} >= {
+            "flashbackvhs",
+            "progressivenodex",
+            "orventerminal",
+            "kpass",
+            "discord-bot",
+            "orvencore-api",
+        }
+
+        detail_response = client.get("/services/flashbackvhs")
+        assert detail_response.status_code == 200
+        assert detail_response.json()["slug"] == "flashbackvhs"
+
+        missing_response = client.get("/services/not-real")
+        assert missing_response.status_code == 404
+
+        me_without_auth = client.get("/services/me")
+        assert me_without_auth.status_code == 401
+
+        assert register(client, normal_username, f"{normal_username}@example.com").status_code == 201
+        normal_tokens = login(client, normal_username)
+
+        access_response = client.get("/services/me", headers=auth_headers(normal_tokens))
+        assert access_response.status_code == 200
+        access_items = access_response.json()
+        api_service = next(service for service in access_items if service["slug"] == "orvencore-api")
+        flashback_service = next(service for service in access_items if service["slug"] == "flashbackvhs")
+        assert api_service["has_access"] is True
+        assert flashback_service["has_access"] is False
+        assert "flashback.read" in flashback_service["missing_permissions"]
+
+        denied_admin_services = client.get("/admin/services", headers=auth_headers(normal_tokens))
+        assert denied_admin_services.status_code == 403
+
+        assert register(client, admin_username, f"{admin_username}@example.com").status_code == 201
+        grant_admin(admin_username)
+        admin_tokens = login(client, admin_username)
+
+        admin_services_response = client.get("/admin/services", headers=auth_headers(admin_tokens))
+        assert admin_services_response.status_code == 200
+
+        created_response = client.post(
+            "/admin/services",
+            headers=auth_headers(admin_tokens),
+            json={
+                "name": "Test Service",
+                "slug": unique("test-service").replace("_", "-"),
+                "description": "Temporary service for tests.",
+                "status": "planned",
+                "required_permissions": ["test.read"],
+            },
+        )
+        assert created_response.status_code == 201
+        created_service = created_response.json()
+
+        patched_response = client.patch(
+            f"/admin/services/{created_service['id']}",
+            headers=auth_headers(admin_tokens),
+            json={"status": "development"},
+        )
+        assert patched_response.status_code == 200
+        assert patched_response.json()["status"] == "development"
+
+        deleted_response = client.delete(
+            f"/admin/services/{created_service['id']}",
+            headers=auth_headers(admin_tokens),
+        )
+        assert deleted_response.status_code == 200
+
+
+def test_service_seed_does_not_duplicate_services():
+    with TestClient(app) as client:
+        before = client.get("/services").json()
+        with SessionLocal() as db:
+            ensure_default_services(db)
+            ensure_default_services(db)
+        after = client.get("/services").json()
+        assert len(after) == len(before)

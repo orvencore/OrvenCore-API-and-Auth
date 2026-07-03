@@ -8,9 +8,16 @@ from app.models.user import User
 DEFAULT_PERMISSIONS = {
     "auth.me": "Read own account profile.",
     "discord.link": "Link own Discord account.",
+    "api.read": "Read OrvenCore API service metadata.",
+    "discord.use": "Use OrvenCore Discord Bot features.",
+    "flashback.read": "Read FlashbackVHS resources.",
+    "marketplace.read": "Read marketplace resources.",
+    "terminal.read": "Read OrvenTerminal resources.",
+    "kpass.read": "Read KPass resources.",
     "admin.users": "Manage users.",
     "admin.discord": "Manage Discord account links.",
     "admin.api_keys": "Manage service API keys.",
+    "admin.services": "Manage registered services.",
 }
 
 DEFAULT_ROLES = {
@@ -18,8 +25,22 @@ DEFAULT_ROLES = {
     "Premium": ["auth.me", "discord.link"],
     "Beta Tester": ["auth.me", "discord.link"],
     "Moderator": ["auth.me", "discord.link", "admin.users"],
-    "Administrator": ["auth.me", "discord.link", "admin.users", "admin.discord", "admin.api_keys"],
-    "Owner": ["auth.me", "discord.link", "admin.users", "admin.discord", "admin.api_keys"],
+    "Administrator": [
+        "auth.me",
+        "discord.link",
+        "admin.users",
+        "admin.discord",
+        "admin.api_keys",
+        "admin.services",
+    ],
+    "Owner": [
+        "auth.me",
+        "discord.link",
+        "admin.users",
+        "admin.discord",
+        "admin.api_keys",
+        "admin.services",
+    ],
 }
 
 

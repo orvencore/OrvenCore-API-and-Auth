@@ -10,6 +10,8 @@ class Settings(BaseSettings):
         default="development",
         validation_alias=AliasChoices("APP_ENV", "ENVIRONMENT"),
     )
+    orvencore_public_url: str = "http://127.0.0.1:8000"
+    orvencore_canonical_domain: str = "orvencore.com"
     database_url: str = "sqlite:///./orvencore.db"
     jwt_secret_key: str = Field(default="change-me", min_length=8)
     jwt_algorithm: str = "HS256"

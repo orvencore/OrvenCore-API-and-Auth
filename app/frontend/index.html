@@ -3,126 +3,23 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>OrvenCore Account</title>
+    <title>OrvenCore</title>
     <link rel="stylesheet" href="/static/styles.css" />
   </head>
   <body>
-    <main class="shell">
-      <section class="brand-panel" aria-label="OrvenCore account overview">
-        <div>
-          <p class="eyebrow">OrvenCore Identity</p>
-          <h1>One account for every OrvenCore service.</h1>
-          <p class="lede">
-            Register, log in, inspect your permissions, and connect Discord to the central API.
-          </p>
-        </div>
-        <div class="status-strip">
-          <span class="status-dot" id="api-dot"></span>
-          <span id="api-status">Checking API</span>
-        </div>
-      </section>
+    <header class="topbar">
+      <a class="brand" href="/" data-link>
+        <span class="brand-mark">OC</span>
+        <span>OrvenCore</span>
+      </a>
+      <nav class="nav" id="nav"></nav>
+    </header>
 
-      <section class="workspace" aria-label="Account forms">
-        <div class="tabs" role="tablist" aria-label="Authentication mode">
-          <button class="tab active" id="login-tab" type="button">Login</button>
-          <button class="tab" id="register-tab" type="button">Register</button>
-        </div>
-
-        <form class="auth-form" id="login-form">
-          <label>
-            Username or email
-            <input name="username_or_email" autocomplete="username" required />
-          </label>
-          <label>
-            Password
-            <input name="password" type="password" autocomplete="current-password" required />
-          </label>
-          <button class="primary-action" type="submit">Login</button>
-        </form>
-
-        <form class="auth-form hidden" id="register-form">
-          <label>
-            Username
-            <input name="username" autocomplete="username" minlength="3" required />
-          </label>
-          <label>
-            Email
-            <input name="email" type="email" autocomplete="email" required />
-          </label>
-          <label>
-            Display name
-            <input name="display_name" autocomplete="name" />
-          </label>
-          <label>
-            Password
-            <input name="password" type="password" autocomplete="new-password" minlength="10" required />
-          </label>
-          <button class="primary-action" type="submit">Create Account</button>
-        </form>
-
-        <div class="notice" id="notice" role="status"></div>
-      </section>
-
-      <section class="account-panel hidden" id="account-panel" aria-label="Signed in account">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Signed In</p>
-            <h2 id="account-title">Account</h2>
-          </div>
-          <button class="secondary-action" id="logout-button" type="button">Logout</button>
-        </div>
-
-        <div class="account-grid">
-          <div>
-            <span class="field-label">Email</span>
-            <strong id="account-email"></strong>
-          </div>
-          <div>
-            <span class="field-label">Discord</span>
-            <strong id="discord-state"></strong>
-          </div>
-        </div>
-
-        <div>
-          <span class="field-label">Roles</span>
-          <div class="pill-row" id="roles"></div>
-        </div>
-
-        <div>
-          <span class="field-label">Permissions</span>
-          <div class="pill-row" id="permissions"></div>
-        </div>
-
-        <div>
-          <span class="field-label">Sessions</span>
-          <div class="session-list" id="sessions"></div>
-        </div>
-
-        <div class="admin-placeholder hidden" id="admin-placeholder">
-          <span class="field-label">Admin</span>
-          <strong>Admin tools are enabled for this account.</strong>
-          <p>User management, Discord links, and service API keys are available through `/admin/*` endpoints.</p>
-        </div>
-
-        <form class="discord-form" id="discord-form">
-          <p class="inline-note" id="discord-link-note"></p>
-          <label>
-            Discord user ID
-            <input name="discord_user_id" inputmode="numeric" required />
-          </label>
-          <label>
-            Discord username
-            <input name="username" required />
-          </label>
-          <label>
-            Avatar URL
-            <input name="avatar_url" type="url" />
-          </label>
-          <button class="primary-action" type="submit">Link Discord</button>
-        </form>
-      </section>
+    <main id="app" class="app-shell" aria-live="polite">
+      <section class="loading-panel">Loading OrvenCore...</section>
     </main>
 
+    <div class="toast" id="toast" role="status"></div>
     <script src="/static/app.js"></script>
   </body>
 </html>
